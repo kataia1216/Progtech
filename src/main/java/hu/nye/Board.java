@@ -8,8 +8,8 @@ public class Board {
     private final int oszlopok;
     private final String[][] tabla;
 
-    /**
-     * konstruktor
+    /*
+        konstruktor
      */
     public Board(int sorok, int oszlopok) {
 
@@ -24,20 +24,22 @@ public class Board {
 
     public void megjelenit() {
 
+        // Oszlopok betűkkel
         for (int i = 0; i < oszlopok; i++) {
-            System.out.print(i+1 + " "); // Oszlop számok alul
-
+            System.out.print((char) ('A' + i) + " ");
         }
-        System.out.println("");
+        System.out.println();
+
+        // Táblázat tartalma
         for (int i = sorok - 1; i >= 0; i--) {
             for (int j = 0; j < oszlopok; j++) {
                 System.out.print((tabla[i][j] == null ? "." : tabla[i][j]) + " ");
             }
             System.out.println();
         }
-
         System.out.println();
     }
+
 
     public boolean korongelhelyez(int oszlop, String korong) {
         if (oszlop < 0 || oszlop >= oszlopok) {
