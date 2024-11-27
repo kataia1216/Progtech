@@ -15,7 +15,7 @@ public class Game {
     private String nev;
     private Player jatekos;
     private Player szamitogep;
-    private static final Logger logger = LoggerFactory.getLogger(Game.class);
+    private static Logger logger = LoggerFactory.getLogger(Game.class);
 
     public Game(int sorok, int oszlopok) {
         this.tabla = new Board(sorok, oszlopok);
