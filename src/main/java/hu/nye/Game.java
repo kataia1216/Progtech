@@ -1,24 +1,19 @@
 package hu.nye;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Random;
 import java.util.Scanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Game {
 
     private final Board tabla;
+    private final FileManager filekezeles; // Fájlkezelő osztály
     private boolean kovjatekos = true;
-    private String nev;
     private Player jatekos;
     private Player szamitogep;
-    private static Logger logger = LoggerFactory.getLogger(Game.class);
 
     public Game(int sorok, int oszlopok) {
         this.tabla = new Board(sorok, oszlopok);
+        this.filekezeles = new FileManager(); // Példányosítjuk az új osztályt
     }
 
     private void inicializalas() {
@@ -26,79 +21,41 @@ public class Game {
         System.out.println("Üdvözöllek a Connect4 játékban!");
         System.out.print("Kérlek, add meg a neved: ");
         String nev = scanner.nextLine();
-        jatekos = new Player(nev, 'Y'); // Játékos sárga színnel fog kezdeni
-        szamitogep = new Player("Számítógép", 'R'); // A számítógép piros színnel fog lépni.
-
-        System.out.println("Szia, " + jatekos.getNev() + "! A sárga koronggal fogsz játszani.");
+        jatekos = new Player(nev, 'Y');
+        szamitogep = new Player("Számítógép", 'R');
+        System.out.println("Szia, " + jatekos.getNev() + "! A(z) \'" + jatekos.getSzin() + "\' koronggal fogsz játszani.");
     }
 
-
-    private void betoltAllapot(String fileNev) {
-        File file = new File(fileNev);
-        if (file.exists()) {
-            try (Scanner scanner = new Scanner(file)) {
-                for (int i = tabla.getSorok() - 1; i >= 0; i--) {
-                    String[] sor = scanner.nextLine().split(" ");
-                    for (int j = 0; j < tabla.getOszlopok(); j++) {
-                        tabla.getTabla()[i][j] = sor[j].equals(".") ? null : sor[j];
-                    }
-                }
-                System.out.println("Játékállás betöltve a fájlból. Te lépsz.");
-            } catch (IOException e) {
-                System.out.println("Hiba történt az állapot betöltése során: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Nem található mentett állapot, üres pályával indul a játék. Te kezdesz.");
-        }
-    }
-
-
-    private void mentesAllapot(String fileNev) {
-        try (PrintWriter writer = new PrintWriter(fileNev)) {
-            for (int i = tabla.getSorok() - 1; i >= 0; i--) {
-                for (int j = 0; j < tabla.getOszlopok(); j++) {
-                    writer.print((tabla.getTabla()[i][j] == null ? "." : tabla.getTabla()[i][j]) + " ");
-                }
-                writer.println();
-            }
-            System.out.println("Játékállás sikeresen elmentve.");
-            logger.info("Játékállás elmentve a '{}' fájlba..", fileNev);
-        } catch (IOException e) {
-            System.out.println("Hiba történt az állapot mentése során: " + e.getMessage());
-            logger.error("Nem sikerült menteni a játékállást a '{}' fájlba: {}", fileNev, e.getMessage());
-        }
-    }
-    
     public void start() {
         inicializalas();
 
         // Játékállapot betöltése induláskor
-        betoltAllapot("allapot.txt");
+        filekezeles.betolt(tabla, "allapot.xml");
 
         // Játék megkezdése
         while (true) {
             tabla.megjelenit();
 
             if (kovjatekos) {
-                if (!jatekosLep()) {
+                if (!jatekosLep()) {        //amíg a játékos nem rögzíti a lépését addig, nem vált át a következő játékosra.
                     continue;
                 }
-            } else {
+            } else {                        //a kovjatekos false akkor a felhasznalo mar lepett és a gép következik.
                 pclep();
             }
 
-            if (tabla.ellenorzes()) {
-                tabla.megjelenit();
-
+            if (tabla.ellenorzes()) {       //leellenőrizem a táblát, hogy az adott körben nyert, e már vlki. Ha az ell.
+                tabla.megjelenit();         //true akkor már valaki nyert, hiszen valakinek valahol kijött a 4 korong.
+                                            // ha az ellenorzes true akkor az adott iterációban ahol a kovjatekos true ott a felhasznalo nyert.
                 if (kovjatekos) {
-                    System.out.println("Gratulálunk, " + nev + ", nyertél!");
+                    System.out.println("Gratulálunk, " + jatekos.getNev() + ", nyertél!");
                 } else {
                     System.out.println("Sajnos vesztettél. A számítógép nyert.");
                 }
                 break;
             }
 
-            kovjatekos = !kovjatekos;
+            kovjatekos = !kovjatekos; //játékos - gép között váltás.
         }
 
         // Játék végén mentés lehetősége
@@ -106,9 +63,7 @@ public class Game {
         System.out.print("Szeretnéd menteni a játékállást? (i/n): ");
         String valasz = scanner.nextLine();
         if (valasz.equals("i")) {
-            mentesAllapot("allapot.txt");
-            System.out.println("Játékállás elmentve az 'allapot.txt' fájlba.");
-
+            filekezeles.mentes(tabla, "allapot.xml");
         } else {
             System.out.println("Játékállás nem került mentésre.");
         }
@@ -120,12 +75,11 @@ public class Game {
         Random random = new Random();
         boolean sikeres = false;
         int oszlop = -1;
-        while (!sikeres) {
+        while (!sikeres) { //addig fut amíg egy random helyre nem rögzíti a korongját a gép
             oszlop = random.nextInt(tabla.getOszlopok());
             sikeres = tabla.korongelhelyez(oszlop, String.valueOf(szamitogep.getSzin()));
         }
-        Move move = new Move(szamitogep, oszlop);
-        System.out.println("A számítógép lépése: " + move);
+        System.out.println("A számítógép lépése: ");
     }
 
     private boolean jatekosLep() {
@@ -133,13 +87,17 @@ public class Game {
         System.out.print(jatekos.getNev() + ", válassz egy oszlopot (A-" + (char) ('A' + tabla.getOszlopok() - 1) + "): ");
         String input = scanner.nextLine().toUpperCase();
 
+        if (input.isEmpty()) {
+            System.out.println("A bemenet nem lehet üres! Kérlek, próbáld újra.");
+            return false;
+        }
+
         if (input.length() != 1 || input.charAt(0) < 'A' || input.charAt(0) >= 'A' + tabla.getOszlopok()) {
             System.out.println("Érvénytelen oszlop! Kérlek, válassz egy érvényes betűt.");
             return false;
         }
 
         int oszlop = input.charAt(0) - 'A';
-
         if (!tabla.korongelhelyez(oszlop, String.valueOf(jatekos.getSzin()))) {
             System.out.println("Ez az oszlop már tele van! Próbálj másikat!");
             return false;
@@ -149,6 +107,5 @@ public class Game {
         System.out.println("Lépés: " + move);
         return true;
     }
-
 
 }

@@ -6,6 +6,5 @@ public class Main {
     {
         Game game = new Game(6, 7); // 6x7-es tábla
         game.start();
-
     }
 }

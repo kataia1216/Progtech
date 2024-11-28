@@ -6,9 +6,9 @@ public class Move {
     private int oszlopa;
 
     // Konstruktor
-    public Move(Player felhasznalo, int column) {
+    public Move(Player felhasznalo, int oszlopa) {
         this.felhasznalo = felhasznalo;
-        this.oszlopa = column;}
+        this.oszlopa = oszlopa;}
 
     //Setterek
     public void setFelhasznalo(Player felhasznalo) {

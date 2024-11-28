@@ -9,7 +9,7 @@ public class Board {
     private final String[][] tabla;
 
     /*
-        konstruktor
+    Konstruktor
      */
     public Board(int sorok, int oszlopok) {
 
@@ -43,7 +43,7 @@ public class Board {
 
     public boolean korongelhelyez(int oszlop, String korong) {
         if (oszlop < 0 || oszlop >= oszlopok) {
-            throw new IllegalArgumentException("Érvénytelen oszlop!");
+            throw new IllegalArgumentException("Érvénytelen oszlop!");                  //nem megfelelő oszlop választás
         }
         for (int i = 0; i < sorok; i++) {
             if (tabla[i][oszlop] == null) { // Végigmegy az adott oszlop összes sorain, s ha talál egy üres cellát oda korongot helyez.
@@ -54,43 +54,80 @@ public class Board {
         return false; // Az oszlop tele van
     }
 
-    //ellenőrzés
+    /*
+      Az ellenörzés függvény végigmegy a játéktáblán és ha, az adott cella nem üres vagy null értéket vesz fel, akkor megvizsgálja a
+      a négy irányt, és ha ott valamelyik irányban kijön az hogy true, tehát a 4 korong akkor igaz értékkel tér vissza
+      Erre azért van szükség mert, amíg false értékkel tér vissza az azt jelenti hogy, nincs még győztes, tehát a játék fut.
+      */
+
     public boolean ellenorzes() {
         for (int sor = 0; sor < sorok; sor++) {
             for (int oszlop = 0; oszlop < oszlopok; oszlop++) {
-                String kezdoCella = tabla[sor][oszlop];
-                if (kezdoCella != null && !kezdoCella.equals(".")) {
-                    // Négy irány ellenőrzése
-                    if (vizsgalat(sor, oszlop, 1, 0, kezdoCella) || // Vízszintes
-                            vizsgalat(sor, oszlop, 0, 1, kezdoCella) || // Függőleges
-                            vizsgalat(sor, oszlop, 1, 1, kezdoCella) || // Átlós (jobbra lefelé)
-                            vizsgalat(sor, oszlop, 1, -1, kezdoCella))  // Átlós (balra lefelé)
-                    {
-                        return true;
+                String kezdoCella = tabla[sor][oszlop];                         //az éppen aktuális cella
+                if (kezdoCella != null && !kezdoCella.equals(".")) {            //ha nem üres, tehát van benne egy korong
+                    if (vizszintes(sor, oszlop, kezdoCella) ||                  //a 4 irány vizsgálata
+                            fuggoleges(sor, oszlop, kezdoCella) ||
+                            atlosJobbraLefele(sor, oszlop, kezdoCella) ||
+                            atlosBalraLefele(sor, oszlop, kezdoCella)) {
+                        return true;                                            //ha vlmelyik irány igaz akkor már vlki nyert.
                     }
                 }
             }
         }
-        return false;
+        return false;                                                           //nincs győztes, a játéknak nincs még vége, fut.
     }
 
-    private boolean vizsgalat(int sor, int oszlop, int dx, int dy, String kezdoCella) {
-        for (int i = 1; i < 4; i++) {
-            int ujSor = sor + i * dx;
-            int ujOszlop = oszlop + i * dy;
+    /*Ha minden egyes iterációban NEM false értéket kap, az azt jelenti, hogy a vizsgálat közben az akt. cella NEM null,
+    az aktuális cella értéke NEM tér el a kezdő cella értékétől. és nem lép ki a tábla határain kívül*/
 
-            // Ellenőrizni kell, hogy az új pozíció a táblán belül van-e
-            if (ujSor < 0 || ujSor >= sorok || ujOszlop < 0 || ujOszlop >= oszlopok) {
-                return false;
-            }
-
-            // Ellenőrizzük, hogy a cella nem null, és azonos a kezdoCella értékével
-            if (tabla[ujSor][ujOszlop] == null || !tabla[ujSor][ujOszlop].equals(kezdoCella)) {
+    private boolean vizszintes(int sor, int oszlop, String kezdoCella) {
+        for (int i = 0; i < 4; i++) {                                                   //xxxx
+            int aktualisOszlop = oszlop + i;                                            //....
+            if (aktualisOszlop >= oszlopok || tabla[sor][aktualisOszlop] == null ||     //....
+                    !tabla[sor][aktualisOszlop].equals(kezdoCella)) {                   //....
                 return false;
             }
         }
         return true;
     }
+
+    private boolean fuggoleges(int sor, int oszlop, String kezdoCella) {
+        for (int i = 0; i < 4; i++) {                                                   //x...
+            int aktualisSor = sor + i;                                                  //x...
+            if (aktualisSor >= sorok || tabla[aktualisSor][oszlop] == null ||           //x...
+                    !tabla[aktualisSor][oszlop].equals(kezdoCella)) {                   //x...
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean atlosJobbraLefele(int sor, int oszlop, String kezdoCella) {
+        for (int i = 0; i < 4; i++) {
+            int aktualisSor = sor + i;                                                   //x...
+            int aktualisOszlop = oszlop + i;                                             //.x..
+            if (aktualisSor >= sorok || aktualisOszlop >= oszlopok ||                    //..x.
+                    tabla[aktualisSor][aktualisOszlop] == null ||                        //...x
+                    !tabla[aktualisSor][aktualisOszlop].equals(kezdoCella)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean atlosBalraLefele(int sor, int oszlop, String kezdoCella) {
+        for (int i = 0; i < 4; i++) {
+            int aktualisSor = sor + i;                                                   //...x
+            int aktualisOszlop = oszlop - i;                                             //..x.
+            if (aktualisSor >= sorok || aktualisOszlop < 0 ||                            //.x..
+                    tabla[aktualisSor][aktualisOszlop] == null ||                        //x...
+                    !tabla[aktualisSor][aktualisOszlop].equals(kezdoCella)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     //Getterek a lekérdezéshez
 
