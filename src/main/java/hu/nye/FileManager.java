@@ -13,7 +13,7 @@ public class FileManager {
     public void mentes(Board tabla, String fileNev) {
         try (PrintWriter writer = new PrintWriter(fileNev)) {
             for (int i = tabla.getSorok() - 1; i >= 0; i--) {
-                for (int j = 0; j < tabla.getOszlopok(); j++) {
+                for (int j = 0; j < tabla.getOszlopok(); j++) { //minden egyes mondat után izé ott mentsen.
                     writer.print((tabla.getTabla()[i][j] == null ? "." : tabla.getTabla()[i][j]) + " ");
                 }
                 writer.println();

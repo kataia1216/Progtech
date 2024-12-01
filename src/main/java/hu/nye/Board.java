@@ -25,12 +25,15 @@ public class Board {
     public void megjelenit() {
 
         // Oszlopok betűkkel
+
         for (int i = 0; i < oszlopok; i++) {
             System.out.print((char) ('A' + i) + " ");
         }
         System.out.println();
 
-        // Táblázat tartalma
+        // Táblázat tartalma, ha üres akkor . ha nem akkor az adott aktuális állapotban, az adott játékosoknak
+        //a hozzájuk tartozó, színű korongjukat jeleníti meg.
+
         for (int i = sorok - 1; i >= 0; i--) {
             for (int j = 0; j < oszlopok; j++) {
                 System.out.print((tabla[i][j] == null ? "." : tabla[i][j]) + " ");
@@ -46,11 +49,12 @@ public class Board {
             throw new IllegalArgumentException("Érvénytelen oszlop!");                  //nem megfelelő oszlop választás
         }
         for (int i = 0; i < sorok; i++) {
-            if (tabla[i][oszlop] == null) { // Végigmegy az adott oszlop összes sorain, s ha talál egy üres cellát oda korongot helyez.
+            if (tabla[i][oszlop] == null ) { // Végigmegy az adott oszlop összes sorain, s ha talál egy üres cellát oda korongot helyez.
                 tabla[i][oszlop] = korong;
                 return true;
             }
         }
+
         return false; // Az oszlop tele van
     }
 
@@ -64,17 +68,17 @@ public class Board {
         for (int sor = 0; sor < sorok; sor++) {
             for (int oszlop = 0; oszlop < oszlopok; oszlop++) {
                 String kezdoCella = tabla[sor][oszlop];                         //az éppen aktuális cella
-                if (kezdoCella != null && !kezdoCella.equals(".")) {            //ha nem üres, tehát van benne egy korong
+                if (kezdoCella != null) {            //ha nem üres, tehát van benne egy korong
                     if (vizszintes(sor, oszlop, kezdoCella) ||                  //a 4 irány vizsgálata
                             fuggoleges(sor, oszlop, kezdoCella) ||
                             atlosJobbraLefele(sor, oszlop, kezdoCella) ||
                             atlosBalraLefele(sor, oszlop, kezdoCella)) {
-                        return true;                                            //ha vlmelyik irány igaz akkor már vlki nyert.
+                        return true;   //ha vlmelyik irány igaz akkor már vlki nyert.
                     }
                 }
             }
         }
-        return false;                                                           //nincs győztes, a játéknak nincs még vége, fut.
+        return false;   //nincs győztes, a játéknak nincs még vége, fut.
     }
 
     /*Ha minden egyes iterációban NEM false értéket kap, az azt jelenti, hogy a vizsgálat közben az akt. cella NEM null,

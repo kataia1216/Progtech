@@ -32,30 +32,37 @@ public class Game {
         // Játékállapot betöltése induláskor
         filekezeles.betolt(tabla, "allapot.xml");
 
+        // A játék folyamatban van
+        boolean jatekFolyamatban = true;
+
         // Játék megkezdése
-        while (true) {
+        while (jatekFolyamatban) {
             tabla.megjelenit();
 
             if (kovjatekos) {
-                if (!jatekosLep()) {        //amíg a játékos nem rögzíti a lépését addig, nem vált át a következő játékosra.
+                if (!jatekosLep()) { // Amíg a játékos nem rögzíti a lépését, nem vált át a következő játékosra
                     continue;
                 }
-            } else {                        //a kovjatekos false akkor a felhasznalo mar lepett és a gép következik.
+            } else { // Ha a kovjatekos false, akkor a játékos lépett, és most a gép következik
                 pclep();
             }
 
-            if (tabla.ellenorzes()) {       //leellenőrizem a táblát, hogy az adott körben nyert, e már vlki. Ha az ell.
-                tabla.megjelenit();         //true akkor már valaki nyert, hiszen valakinek valahol kijött a 4 korong.
-                                            // ha az ellenorzes true akkor az adott iterációban ahol a kovjatekos true ott a felhasznalo nyert.
+            // Mentsük a tábla aktuális állapotát minden kör után
+            filekezeles.mentes(tabla, "allapot.xml");
+
+            // Ellenőrizzük, hogy van-e nyertes
+            if (tabla.ellenorzes()) {
+                tabla.megjelenit();
                 if (kovjatekos) {
                     System.out.println("Gratulálunk, " + jatekos.getNev() + ", nyertél!");
                 } else {
                     System.out.println("Sajnos vesztettél. A számítógép nyert.");
                 }
-                break;
+                jatekFolyamatban = false; // Kilépés a ciklusból
             }
 
-            kovjatekos = !kovjatekos; //játékos - gép között váltás.
+            // Játékos és gép közötti váltás
+            kovjatekos = !kovjatekos;
         }
 
         // Játék végén mentés lehetősége
@@ -70,6 +77,7 @@ public class Game {
 
         System.out.println("A játék véget ért. Köszönöm, hogy játszottál!");
     }
+
 
     private void pclep() {
         Random random = new Random();

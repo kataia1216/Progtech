@@ -2,35 +2,24 @@ package hu.nye;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Egyszerű JUnit 5 tesztosztály.
- */
+
 public class AppTest {
 
-    /**
-     * Egy teszt, amely ellenőrzi, hogy a feltétel igaz-e.
-     */
     @Test
-    public void testApp() {
-        assertTrue(true, "A feltétel igaz.");
-    }
+    void testOszlopTele() {
+        // létrehozom a táblát
+        Board board = new Board(6, 7);
 
-    @Test
-    void testPlayerCreation() {
-        Player player = new Player("Teszt", 'Y');
-        assertEquals("Teszt", player.getNev());
-        assertEquals('Y', player.getSzin());
-    }
+        // az első oszlopot feltöltöm Y színnel
+        for (int i = 0; i < board.getSorok(); i++) {
+            board.korongelhelyez(0, "Y");
+        }
+        // Most hogy az előző kód lefutott elvileg az adott oszlop teli van, ezért megpróbálok mégegy korongot elhelyezni
+        boolean sikeres = board.korongelhelyez(0, "Y"); //tagadni
 
-    @Test
-    void testMoveCreation() {
-        Player player = new Player("Teszt", 'R');
-        Move move = new Move(player, 3);
-        assertEquals(player, move.getFelhasznalo());
-        assertEquals(3, move.getOszlopa());
+        // Mivel elvileg nem kéne elhelyezni a korogot ezért hibát kell dobjon.
+        assertFalse(sikeres, "Az oszlop már tele van, nem helyezhető el új korong.");
     }
-
 }
