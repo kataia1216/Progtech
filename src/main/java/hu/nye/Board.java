@@ -19,7 +19,8 @@ public class Board {
 
         this.sorok = sorok;
         this.oszlopok = oszlopok;
-        this.tabla = new String[sorok][oszlopok]; //tabla inicial. 2dimenzios tomben
+        this.tabla = new String[sorok][oszlopok];     //tabla inicial. 2dimenzios tomben
+
     }
 
     public void megjelenit() {
@@ -31,7 +32,7 @@ public class Board {
         }
         System.out.println();
 
-        // Táblázat tartalma, ha üres akkor . ha nem akkor az adott aktuális állapotban, az adott játékosoknak
+        // Táblázat tartalma, ha üres akkor ".", ha nem akkor az adott aktuális állapotban, az adott játékosoknak
         //a hozzájuk tartozó, színű korongjukat jeleníti meg.
 
         for (int i = sorok - 1; i >= 0; i--) {
@@ -63,6 +64,19 @@ public class Board {
       a négy irányt, és ha ott valamelyik irányban kijön az hogy true, tehát a 4 korong akkor igaz értékkel tér vissza
       Erre azért van szükség mert, amíg false értékkel tér vissza az azt jelenti hogy, nincs még győztes, tehát a játék fut.
       */
+
+    public boolean tablaTeli()
+    {
+        for(int j = 0; j< oszlopok; j++)
+        {
+            if(tabla[sorok-1][j] == null)
+            {
+                return false; //ha bármelyik cella üres a legfelső sorban akkor adjon false-t
+            }
+        }
+        return true; // akkor true ha legfelső sor összes cellájában már van érték, ergo nem lehet korongot belehelyezni
+    }
+
 
     public boolean ellenorzes() {
         for (int sor = 0; sor < sorok; sor++) {
